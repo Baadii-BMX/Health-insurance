@@ -94,25 +94,27 @@ def chat():
         # Handle specific patterns directly without relying on Rasa
         if "дэвтэргүй" in message_lower or "дэвтэр" in message_lower:
             return jsonify({'text': "Эрүүл мэндийн даатгалын цахим системд шилжсэнээс хойш эрүүл мэндийн даатгалын дэвтэр шаардлагагүй болсон. Регистрийн дугаараар болон хурууны хээгээ уншуулж эрүүл мэндийн тусламж үйлчилгээ авах боломжтой."})
-        elif "гэрээт" in message_lower and "эмнэлг" in message_lower:
-            return jsonify({'text': "Эрүүл мэндийн даатгалын ерөнхий газартай гэрээт эрүүл мэндийн байгууллагын хаяг байршил, утасны дугаар, үйл ажиллагааны чиглэл www.emd.gov.mn сайтад гэрээт байгууллага цэс рүү нэвтрэн орж харах боломжтой."})
-        elif "жагсаалт" in message_lower and "эмнэлг" in message_lower:
-            return jsonify({'text': "Эрүүл мэндийн даатгалын ерөнхий газартай гэрээт эрүүл мэндийн байгууллагын хаяг байршил, утасны дугаар, үйл ажиллагааны чиглэл www.emd.gov.mn сайтад гэрээт байгууллага цэс рүү нэвтрэн орж харах боломжтой."})
-        elif "шимтгэл" in message_lower or "төлбөр" in message_lower or "хураамж" in message_lower:
-            return jsonify({'text': "ЭМД-ын шимтгэл 2025 оны 1-3 сар хүртэл сарын 13200 төгрөг, 4-р сараас эхлэн 15840 төгрөг болно."})
-        elif "хөнгөлөлт" in message_lower and "эм" in message_lower:
-            return jsonify({'text': "ЭМД-ын хөнгөлөлттэй эмийн жагсаалтаар 600 нэр төрлийн эмийг 30-100 хувийн хөнгөлөлттэй үнээр авах боломжтой."})
-        elif "үйлчилгээ" in message_lower or "тусламж" in message_lower and "болох" in message_lower:
-            return jsonify({'text': "Эрүүл мэндийн даатгалаар авах боломжтой тусламж үйлчилгээ: Хэвтүүлэн эмчлэх тусламж, амбулаторийн тусламж, өндөр өртөгтэй оношилгоо, яаралтай тусламж, түргэн тусламж, телемедицин, өдрийн эмчилгээ, диализ, хорт хавдрын хими, сэргээн засах тусламж, хөнгөвчлөх тусламж, уламжлалт анагаах ухааны тусламж, эмийн үнийн хөнгөлөлт."})
-        
-        # If no direct match, pass to Rasa API
-        response = rasa_api.send_message(user_message)
-        logger.debug(f"Rasa response: {response}")
-        
-        if not response or 'text' not in response:
-            return jsonify({'text': 'Уучлаарай, хариу өгөх боломжгүй байна. Дахин оролдоно уу.'})
-            
-        return jsonify(response)
+        elif ("гэрээт" in message_lower and "эмнэлг" in message_lower) or ("эмнэлэг" in message_lower and "гэрээ" in message_lower) or ("эмнэлгүүд" in message_lower) or ("эмд-тэй" in message_lower) or ("жагсаалт" in message_lower and "эмнэлг" in message_lower):
+            return jsonify({'text': "Эрүүл мэндийн даатгалын ерөнхий газар нь бүх аймаг, дүүргийн нэгдсэн эмнэлэг, төв эмнэлэг, өрхийн эмнэлэг болон 150 гаруй хувийн эмнэлэгтэй гэрээтэй. Бүх гэрээт эмнэлгийн жагсаалтыг www.emd.gov.mn сайтын 'Гэрээт байгууллага' цэснээс харах боломжтой."})
+        elif "шимтгэл" in message_lower or "төлбөр" in message_lower or "хураамж" in message_lower or "хэмжээ" in message_lower or "хэд вэ" in message_lower:
+            return jsonify({'text': "ЭМД-ын шимтгэлийн хэмжээ: 2025 оны 1-3 сар хүртэл сарын 13200 төгрөг, 4-р сараас эхлэн 15840 төгрөг болно. Ажил олгогч, даатгуулагч тус тус 2:1 харьцаагаар хуваан төлнө."})
+        elif "дутуу сар" in message_lower or "шалгах" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалын шимтгэлийн дутуу саруудаа дараах сувгуудаар шалгах боломжтой: 1) www.emd.gov.mn сайтаар, 2) www.e-mongolia.mn сайт болон аппликейшнээр, 3) Ибаримт аппликейшн ашиглаж шалгах боломжтой."})
+        elif ("хөнгөлөлт" in message_lower and "эм" in message_lower) or ("эмийн жагсаалт" in message_lower) or ("эмийн" in message_lower and "хөнгөлөлт" in message_lower):
+            return jsonify({'text': "ЭМД-ын хөнгөлөлттэй эмийн жагсаалтад 600 гаруй нэр төрлийн эм орсон бөгөөд 30-100% хүртэлх хөнгөлөлттэй үнээр авах боломжтой. Бүрэн жагсаалтыг emd.gov.mn сайтаас харах боломжтой."})
+        elif ("үйлчилгээ" in message_lower and "болох" in message_lower) or ("тусламж" in message_lower and "авах" in message_lower) or ("авч болох" in message_lower) or ("үйлчилгээ" in message_lower and "авах" in message_lower):
+            return jsonify({'text': "Эрүүл мэндийн даатгалаар авах боломжтой үйлчилгээнүүд: 1) Хэвтүүлэн эмчлэх тусламж үйлчилгээ, 2) Амбулаторийн тусламж үйлчилгээ, 3) Өндөр өртөгтэй оношилгоо, шинжилгээ, 4) Яаралтай тусламж, 5) Түргэн тусламж, 6) Телемедицин, 7) Өдрийн эмчилгээ үйлчилгээ, 8) Эмийн үнийн хөнгөлөлт."})
+        elif "төлөх" in message_lower or "сувг" in message_lower or "хаанаас" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалаа дараах сувгуудаар төлөх боломжтой: 1) И-Баримт гар утасны апп, 2) И-Баримт вэб сайтаар, 3) E-Mongolia аппликейшн, 4) Банкны салбар, 5) Банкны автомат машин (ATM), 6) Интернет банк."})
+        elif "заавал" in message_lower or "нөхөн төлөх" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалын тухай хуулиар Монгол улсын иргэн бүр эрүүл мэндийн албан журмын даатгалд заавал даатгуулах үүрэгтэй. Энэхүү даатгал нь эмнэлгийн зардлын төлбөрийг хөнгөвчилдөг."})
+        elif "битүүмж" in message_lower:
+            return jsonify({'text': "Битүүмж нь тухайн эрүүл мэндийн байгууллагад иргэн даатгуулагчийн үйлчлүүлж байгааг илэрхийлсэн мэдээлэл бөгөөд нээх, хаах нь тухайн эрүүл мэндийн байгууллагын хариуцах асуудал юм."})
+        elif "сайн" in message_lower or "өдрийн мэнд" in message_lower:
+            return jsonify({'text': "Сайн байна уу! Би Эрүүл Мэндийн Даатгалын бот байна. Танд хэрхэн туслах вэ?"})
+        # If no direct match, use a general response about EMD
+        else:
+            return jsonify({'text': "Эрүүл мэндийн даатгал нь даатгуулагчийн эрүүл мэндийн улмаас учирч болзошгүй санхүүгийн эрсдэлийг хуваалцах зорилготой. emd.gov.mn сайтаас дэлгэрэнгүй мэдээлэл авах боломжтой. Тодорхой асуулт байвал надаас асууна уу."})
         
     except requests.exceptions.ConnectionError:
         logger.error("Could not connect to Rasa server")
