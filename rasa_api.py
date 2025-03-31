@@ -60,19 +60,27 @@ def send_message(message_text):
         # Get the most appropriate fallback response based on message content
         message_lower = message_text.lower()
         
-        # Check for different types of queries and return an appropriate response
-        if "сайн" in message_lower or "мэнд" in message_lower:
+        # Using more specific keywords for more accurate matching
+        if "сайн" in message_lower or "өдрийн мэнд" in message_lower or "мэнд" in message_lower:
             return {"text": FALLBACK_RESPONSES["greet"]}
-        elif "эмнэлг" in message_lower or "эмнэлэг" in message_lower or "гэрээт" in message_lower:
+        elif "эмнэлг" in message_lower or "эмнэлэг" in message_lower or "гэрээт" in message_lower or "эмнэлгүүд" in message_lower:
             return {"text": FALLBACK_RESPONSES["hospital"]}
-        elif "эм" in message_lower or "хөнгөлөлт" in message_lower:
+        elif "эм" in message_lower or "хөнгөлөлт" in message_lower or "жагсаалт" in message_lower:
             return {"text": FALLBACK_RESPONSES["medicine"]}
-        elif "төлбөр" in message_lower or "шимтгэл" in message_lower or "хураамж" in message_lower:
+        elif "төлбөр" in message_lower or "шимтгэл" in message_lower or "хураамж" in message_lower or "хэд вэ" in message_lower:
             return {"text": FALLBACK_RESPONSES["fee"]}
-        elif "үйлчилгээ" in message_lower or "тусламж" in message_lower or "авч болох" in message_lower:
+        elif "үйлчилгээ" in message_lower or "тусламж" in message_lower or "авч болох" in message_lower or "боломжтой" in message_lower:
             return {"text": FALLBACK_RESPONSES["service"]}
-        elif "төлөх" in message_lower or "төлбөр" in message_lower or "төлөлт" in message_lower:
+        elif "төлөх" in message_lower or "төлөлт" in message_lower or "сувгуудаар" in message_lower:
             return {"text": FALLBACK_RESPONSES["payment"]}
+        elif "дэвтэр" in message_lower or "дэвтэргүй" in message_lower:
+            return {"text": "Эрүүл мэндийн даатгалын цахим системд шилжсэнээс хойш эрүүл мэндийн даатгалын дэвтэр шаардлагагүй болсон. Регистрийн дугаараар болон хурууны хээгээ уншуулж эрүүл мэндийн тусламж үйлчилгээ авах боломжтой."}
+        elif "нөхөн төлөх" in message_lower or "заавал" in message_lower:
+            return {"text": "Эрүүл мэндийн даатгалын тухай хуулиар иргэн бүр эрүүл мэндийн албан журмын даатгалд заавал даатгуулах үүрэгтэй. Энэ нь таны эрүүл мэндийн эрсдэлийг бууруулах чухал алхам юм."}
+        elif "битүүмж" in message_lower:
+            return {"text": "Битүүмж нь тухайн эрүүл мэндийн байгууллагад иргэн, даатгуулагчийн үйлчлүүлж байгааг илэрхийлсэн мэдээлэл бөгөөд нээх, хаах нь тухайн эрүүл мэндийн байгууллагын хариуцах асуудал юм."}
+        elif "шалгах" in message_lower or "дутуу сар" in message_lower:
+            return {"text": "Эрүүл мэндийн даатгалын шимтгэлийн дутуу саруудаа дараах сувгуудаар шалгах боломжтой: Эрүүл мэндийн даатгалын ерөнхий газрын www.emd.gov.mn сайт, www.e-mongolia.mn сайт, эсвэл Ибаримт аппликейшн ашиглаж шалгах боломжтой."}
         else:
             return {"text": FALLBACK_RESPONSES["default"]}
     except Exception as e:

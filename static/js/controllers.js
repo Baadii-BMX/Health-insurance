@@ -81,6 +81,14 @@
             vm.messageText = '';
 
             // Send message to backend
+            // Scroll to bottom immediately after user sends message
+            setTimeout(function() {
+                var chatContainer = document.querySelector('.chat-messages');
+                if (chatContainer) {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            }, 50);
+
             ChatService.sendMessage(userMessage.text)
                 .then(function(response) {
                     var botMessage = {
