@@ -18,17 +18,56 @@
         vm.isRecording = false;
         vm.recognition = null;
         vm.isMicAvailable = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+        vm.showQuickQuestions = true;
         
-        // Quick questions list
-        vm.quickQuestions = [
-            { id: 1, text: 'ЭМД төлбөр хэмжээ хэд вэ?' },
-            { id: 2, text: 'Эмийн үнийн хөнгөлөлт' },
-            { id: 3, text: 'Хөнгөлөлттэй эмийн жагсаалт' },
-            { id: 4, text: 'ЭМД-ын гэрээт эмнэлгүүд' },
-            { id: 5, text: 'Даатгалын шимтгэлийн дутуу саруудаа хэрхэн шалгах вэ?' },
-            { id: 6, text: 'Эрүүл мэндийн даатгалаа хэрхэн төлөх вэ?' },
-            { id: 7, text: 'Даатгалаараа ямар оношилгоонд хамрагдаж болох вэ?' }
+        // Quick questions categories
+        vm.currentCategory = 'main';
+        
+        // Main quick questions list
+        vm.mainQuestions = [
+            { id: 1, text: 'ЭМД төлбөр хэмжээ хэд вэ?', category: 'payment' },
+            { id: 2, text: 'Эмийн үнийн хөнгөлөлт', category: 'medicine' },
+            { id: 3, text: 'Хөнгөлөлттэй эмийн жагсаалт', category: 'medicine' },
+            { id: 4, text: 'ЭМД-ын гэрээт эмнэлгүүд', category: 'hospitals' },
+            { id: 5, text: 'Даатгалын шимтгэлийн дутуу саруудаа хэрхэн шалгах вэ?', category: 'payment' },
+            { id: 6, text: 'Эрүүл мэндийн даатгалаа хэрхэн төлөх вэ?', category: 'payment' },
+            { id: 7, text: 'Даатгалаараа ямар оношилгоонд хамрагдаж болох вэ?', category: 'services' }
         ];
+        
+        // Medicine related questions
+        vm.medicineQuestions = [
+            { id: 8, text: 'Зүрх судасны эмийн хөнгөлөлт' },
+            { id: 9, text: 'Чихрийн шижингийн эмийн хөнгөлөлт' },
+            { id: 10, text: 'Астма, уушгины эмийн хөнгөлөлт' },
+            { id: 11, text: 'Буцах' }
+        ];
+        
+        // Payment related questions
+        vm.paymentQuestions = [
+            { id: 12, text: 'И-Баримт гар утасны апп ашиглах' },
+            { id: 13, text: 'Банкны салбар ашиглах' },
+            { id: 14, text: 'E-Mongolia аппликейшн ашиглах' },
+            { id: 15, text: 'Буцах' }
+        ];
+        
+        // Hospital related questions
+        vm.hospitalsQuestions = [
+            { id: 16, text: 'Улаанбаатар хотын эмнэлгүүд' },
+            { id: 17, text: 'Орон нутгийн эмнэлгүүд' },
+            { id: 18, text: 'Хувийн эмнэлгүүд' },
+            { id: 19, text: 'Буцах' }
+        ];
+        
+        // Services related questions
+        vm.servicesQuestions = [
+            { id: 20, text: 'Оношилгоо, шинжилгээ' },
+            { id: 21, text: 'Хэвтүүлэн эмчлэх тусламж' },
+            { id: 22, text: 'Өдрийн эмчилгээ' },
+            { id: 23, text: 'Буцах' }
+        ];
+        
+        // Set active questions based on category
+        vm.quickQuestions = vm.mainQuestions;
 
         // Initialize speech recognition if available
         if (vm.isMicAvailable) {
@@ -77,8 +116,42 @@
         // Apply dark mode on initialization
         document.documentElement.setAttribute('data-bs-theme', vm.darkMode ? 'dark' : 'light');
 
+        // Function to change question category
+        vm.changeQuestionCategory = function(category) {
+            if (category === 'main') {
+                vm.quickQuestions = vm.mainQuestions;
+                vm.currentCategory = 'main';
+            } else if (category === 'medicine') {
+                vm.quickQuestions = vm.medicineQuestions;
+                vm.currentCategory = 'medicine';
+            } else if (category === 'payment') {
+                vm.quickQuestions = vm.paymentQuestions;
+                vm.currentCategory = 'payment';
+            } else if (category === 'hospitals') {
+                vm.quickQuestions = vm.hospitalsQuestions;
+                vm.currentCategory = 'hospitals';
+            } else if (category === 'services') {
+                vm.quickQuestions = vm.servicesQuestions;
+                vm.currentCategory = 'services';
+            }
+        };
+        
         // Function to handle quick question selection
         vm.selectQuickQuestion = function(question) {
+            // If it's the "Буцах" option
+            if (question.text === 'Буцах') {
+                vm.changeQuestionCategory('main');
+                return;
+            }
+            
+            // If the question has a category, show that category's questions after answer
+            if (question.category) {
+                setTimeout(function() {
+                    vm.changeQuestionCategory(question.category);
+                    $scope.$apply();
+                }, 1000);
+            }
+            
             vm.messageText = question.text;
             vm.sendMessage();
         };

@@ -28,10 +28,16 @@
             </div>
             
             <div class="chat-messages">
-                <!-- Quick Questions Panel -->
-                <div class="quick-questions" ng-if="vm.chatMessages.length === 0">
-                    <h5>Сайн байна уу? Би Эрүүл Мэндийн Даатгалын чатбот байна.</h5>
-                    <p>Танд хэрхэн туслах вэ? Доорх асуултуудаас сонгох юм уу, өөрийн асуултаа бичнэ үү:</p>
+                <!-- Quick Questions Panel - always show but change content based on conversation state -->
+                <div class="quick-questions">
+                    <h5 ng-if="vm.chatMessages.length === 0">Сайн байна уу? Би Эрүүл Мэндийн Даатгалын чатбот байна.</h5>
+                    <h5 ng-if="vm.chatMessages.length > 0 && vm.currentCategory === 'main'">Өөр асуулт асуух уу?</h5>
+                    <h5 ng-if="vm.currentCategory === 'medicine'">Эмийн хөнгөлөлтийн талаар</h5>
+                    <h5 ng-if="vm.currentCategory === 'payment'">Төлбөр төлөх аргууд</h5>
+                    <h5 ng-if="vm.currentCategory === 'hospitals'">Гэрээт эмнэлгүүд</h5>
+                    <h5 ng-if="vm.currentCategory === 'services'">Тусламж үйлчилгээний төрлүүд</h5>
+                    
+                    <p ng-if="vm.chatMessages.length === 0">Танд хэрхэн туслах вэ? Доорх асуултуудаас сонгох юм уу, өөрийн асуултаа бичнэ үү:</p>
                     
                     <button 
                         ng-repeat="question in vm.quickQuestions" 

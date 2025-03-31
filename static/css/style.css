@@ -76,6 +76,15 @@ body {
     flex-direction: column;
 }
 
+/* Fix positioning for quick questions panel - always at the top */
+.quick-questions {
+    order: -1;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 .chat-footer {
     padding: 15px;
     border-top: 1px solid var(--bs-border-color);
