@@ -13,13 +13,8 @@ body {
 .chat-header {
     padding: 15px;
     border-bottom: 1px solid var(--bs-border-color);
-    background-color: #1a5f9e;
+    background-color: var(--bs-primary);
     color: white;
-}
-
-.emd-logo {
-    height: 40px;
-    margin-right: 10px;
 }
 
 /* Quick Questions Panel */
