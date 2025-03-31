@@ -143,7 +143,7 @@ def get_medicines():
         logger.error(f"Error fetching medicines: {e}")
         return jsonify({'error': 'Эмийн мэдээлэл авах үед алдаа гарлаа.'}), 500
 
-@app.route('/api/unanswered', methods=['POST'])
+@app.route('/api/save-unanswered', methods=['POST'])
 def save_unanswered():
     data = request.json
     question = data.get('question', '')

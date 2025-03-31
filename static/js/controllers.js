@@ -113,6 +113,9 @@
                             chatContainer.scrollTop = chatContainer.scrollHeight;
                         }
                     }, 100);
+                    
+                    // Log for debugging
+                    console.log('Chat messages:', vm.chatMessages);
                 });
         };
     }
