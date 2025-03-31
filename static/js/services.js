@@ -2,13 +2,12 @@
     'use strict';
 
     angular
-        .module('core')
+        .module('core.services', [])
         .factory('ChatService', ChatService);
 
-    ChatService.$inject = ['$http', '$q'];
+    ChatService.$inject = ['$http'];
 
-    function ChatService($http, $q) {
-        // Service for handling chat communication with backend
+    function ChatService($http) {
         var service = {
             sendMessage: sendMessage,
             getHospitals: getHospitals,
@@ -18,48 +17,28 @@
 
         return service;
 
+        // Function to send message to the chatbot
         function sendMessage(message) {
-            return $http.post('/chat', { message: message })
-                .then(function(response) {
-                    return response.data;
-                })
-                .catch(function(error) {
-                    console.error('Error sending message:', error);
-                    return $q.reject(error);
-                });
+            return $http.post('/chat', {
+                message: message
+            });
         }
 
+        // Function to get hospitals list
         function getHospitals() {
-            return $http.get('/api/hospitals')
-                .then(function(response) {
-                    return response.data;
-                })
-                .catch(function(error) {
-                    console.error('Error fetching hospitals:', error);
-                    return $q.reject(error);
-                });
+            return $http.get('/api/hospitals');
         }
 
-        function getMedicines(params) {
-            return $http.get('/api/medicines', { params: params })
-                .then(function(response) {
-                    return response.data;
-                })
-                .catch(function(error) {
-                    console.error('Error fetching medicines:', error);
-                    return $q.reject(error);
-                });
+        // Function to get medicines list
+        function getMedicines() {
+            return $http.get('/api/medicines');
         }
 
+        // Function to save unanswered questions
         function saveUnansweredQuestion(question) {
-            return $http.post('/api/unanswered', { question: question })
-                .then(function(response) {
-                    return response.data;
-                })
-                .catch(function(error) {
-                    console.error('Error saving unanswered question:', error);
-                    return $q.reject(error);
-                });
+            return $http.post('/api/save-unanswered', {
+                question: question
+            });
         }
     }
 })();
