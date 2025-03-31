@@ -6,6 +6,7 @@ from flask_cors import CORS
 import requests
 from models import db, Hospital, Medicine, UnansweredQuestion
 import rasa_api
+from learning_engine import learning_engine
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -88,6 +89,10 @@ def chat():
         # Log the user message for debugging
         logger.debug(f"User message: '{user_message}'")
         
+        # Use the learning engine to learn from this question
+        # This enables the chatbot to gradually improve with interactions
+        learning_engine.learn_from_question(user_message)
+        
         # Direct pattern matching for common questions
         message_lower = user_message.lower()
         
@@ -95,7 +100,7 @@ def chat():
         if "дэвтэргүй" in message_lower or "дэвтэр" in message_lower:
             return jsonify({'text': "Эрүүл мэндийн даатгалын цахим системд шилжсэнээс хойш эрүүл мэндийн даатгалын дэвтэр шаардлагагүй болсон. Регистрийн дугаараар болон хурууны хээгээ уншуулж эрүүл мэндийн тусламж үйлчилгээ авах боломжтой."})
         elif "ходоод" in message_lower and "өвчин" in message_lower:
-            return jsonify({'text': "Ходоодны өвчний үед Эрүүл мэндийн даатгалын гэрээт эмнэлэгт үзүүлэх боломжтой. Улсын гуравдугаар төв эмнэлэг, Улсын нэгдүгээр төв эмнэлэг, Гастроэнтерологийн төв зэрэг ходоодны өвчнөөр мэргэшсэн эмнэлгүүд байдаг. Эмнэлгийн дэлгэрэнгүй жагсаалтыг emd.gov.mn сайтын 'Гэрээт байгууллага' цэснээс харах боломжтой."})
+            return jsonify({'text': "Ходоодны өвчний үед дараах эмнэлгүүдэд үзүүлэх боломжтой: 1) Улсын гуравдугаар төв эмнэлэг, 2) Улсын нэгдүгээр төв эмнэлэг, 3) Гастроэнтерологийн төв, 4) Интермед эмнэлэг, 5) Гранд-Мед дүүргийн эмнэлгүүд. Эдгээр эмнэлгүүд гастроэнтеролог нарийн мэргэжлийн эмчтэй бөгөөд дуран шинжилгээ, компьютер томограф, соронзон резонансын шинжилгээнүүдийг ЭМД-аар 70-90% хөнгөлөлттэй хийлгэх боломжтой. Эмнэлгийн магадлагаатай бол үзлэгийн төлбөр мөн хөнгөлөлттэй."})
         elif "ханиад" in message_lower or "томуу" in message_lower or ("эм" in message_lower and "ууж" in message_lower):
             return jsonify({'text': "Ханиад, томууны үед хэрэглэх хөнгөлөлттэй эмэнд Парацетамол, Ибупрофен, Аспирин, Амоксициллин зэрэг орж, 40-70% хөнгөлөлттэй. Эмч Танд өвчний онцлогт тохирсон эм бичиж өгөх болно. Өрхийн эмнэлэгт үзүүлээд, эмийн жор авах нь хамгийн зөв."})
         elif "парацетамол" in message_lower:
@@ -109,7 +114,7 @@ def chat():
         elif ("хөнгөлөлт" in message_lower and "эм" in message_lower) or ("эмийн жагсаалт" in message_lower) or ("эмийн" in message_lower and "хөнгөлөлт" in message_lower) or ("өвчин" in message_lower and "эм" in message_lower):
             return jsonify({'text': "ЭМД-ын хөнгөлөлттэй эмийн жагсаалтад 600 гаруй нэр төрлийн эм орсон бөгөөд 30-100% хүртэлх хөнгөлөлттэй үнээр авах боломжтой. Эмч таны өвчнийг оношлон, тохирох эмийн жор бичиж өгөх бөгөөд, хөнгөлөлттэй эмүүдийг эмчийн жороор авах боломжтой. Бүрэн жагсаалтыг emd.gov.mn сайтаас харах боломжтой."})
         elif ("үйлчилгээ" in message_lower and "болох" in message_lower) or ("тусламж" in message_lower and "авах" in message_lower) or ("авч болох" in message_lower) or ("үйлчилгээ" in message_lower and "авах" in message_lower):
-            return jsonify({'text': "Эрүүл мэндийн даатгалаар авах боломжтой үйлчилгээнүүд: 1) Хэвтүүлэн эмчлэх тусламж үйлчилгээ, 2) Амбулаторийн тусламж үйлчилгээ, 3) Өндөр өртөгтэй оношилгоо, шинжилгээ, 4) Яаралтай тусламж, 5) Түргэн тусламж, 6) Телемедицин, 7) Өдрийн эмчилгээ үйлчилгээ, 8) Эмийн үнийн хөнгөлөлт."})
+            return jsonify({'text': "Эрүүл мэндийн даатгалаар дараах тусламж, үйлчилгээнүүдийг авах боломжтой: 1) Хэвтүүлэн эмчлэх тусламж үйлчилгээ (70-90% хөнгөлөлттэй), 2) Амбулаторийн тусламж үйлчилгээ (50% хөнгөлөлттэй), 3) Өндөр өртөгтэй оношилгоо, шинжилгээ (30-80% хөнгөлөлттэй), 4) Яаралтай тусламж (бүрэн хөнгөлөлттэй), 5) Түргэн тусламж (бүрэн хөнгөлөлттэй), 6) Телемедицин үйлчилгээ (50% хөнгөлөлттэй), 7) Өдрийн эмчилгээ үйлчилгээ (70% хөнгөлөлттэй), 8) Уламжлалт анагаах ухааны тусламж (40% хөнгөлөлттэй), 9) Сэргээн засах тусламж (40-70% хөнгөлөлттэй), 10) Хөнгөвчлөх тусламж (80% хөнгөлөлттэй), 11) Эмийн үнийн хөнгөлөлт (30-100% хөнгөлөлттэй)."})
         elif "төлөх" in message_lower or "сувг" in message_lower or "хаанаас" in message_lower:
             return jsonify({'text': "Эрүүл мэндийн даатгалаа дараах сувгуудаар төлөх боломжтой: 1) И-Баримт гар утасны апп, 2) И-Баримт вэб сайтаар, 3) E-Mongolia аппликейшн, 4) Банкны салбар, 5) Банкны автомат машин (ATM), 6) Интернет банк."})
         elif "заавал" in message_lower or "нөхөн төлөх" in message_lower:
@@ -118,9 +123,15 @@ def chat():
             return jsonify({'text': "Битүүмж нь тухайн эрүүл мэндийн байгууллагад иргэн даатгуулагчийн үйлчлүүлж байгааг илэрхийлсэн мэдээлэл бөгөөд нээх, хаах нь тухайн эрүүл мэндийн байгууллагын хариуцах асуудал юм."})
         elif "сайн" in message_lower or "өдрийн мэнд" in message_lower:
             return jsonify({'text': "Сайн байна уу! Би Эрүүл Мэндийн Даатгалын бот байна. Танд хэрхэн туслах вэ?"})
-        # If no direct match, use a general response about EMD
+        elif "даатгал гэж юу" in message_lower or "даатгал" in message_lower and "юу" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгал гэдэг нь иргэдийн эрүүл мэндийн тусламж үйлчилгээний зардлыг хуваалцах зорилготой нийгмийн даатгалын нэг хэлбэр юм. Энэ нь өвчин эмгэг, гэмтэл бэртлийн улмаас үүсэх эмнэлгийн тусламж үйлчилгээний зардлыг даатгуулагчид хөнгөвчлөх үүрэгтэй. Эрүүл мэндийн даатгалд хамрагдсан иргэд эмнэлэгт үзүүлэх, шинжилгээ өгөх, эмчилгээ хийлгэх, эм авах үеийн зардлаа хөнгөлөлттэйгөөр төлөх боломжтой."})
+        elif "чадваргүй" in message_lower and "иргэд" in message_lower or "хөнгөлөлт үзүүлж" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалын хуулийн дагуу дараах иргэдийн ЭМД-ыг төрөөс хариуцан төлдөг: 1) 0-18 насны хүүхэд, 2) Тэтгэврээс өөр тогтмол орлогогүй иргэн, 3) Нийгмийн халамжийн дэмжлэг шаардлагатай өрхийн гишүүн, 4) Хүүхдээ 2 нас (ихэр бол 3 нас) хүртэл өсгөж буй эцэг/эх, 5) Ял эдэлж буй ялтан. Эдгээр иргэд ЭМД төлөлгүйгээр эрүүл мэндийн тусламж үйлчилгээг авах боломжтой."})
+        elif "оношилгоо" in message_lower or "шинжилгээ" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалаар дараах оношилгоо, шинжилгээнүүдийг авах боломжтой: 1) Цусны ерөнхий шинжилгээ, 2) Шээсний шинжилгээ, 3) Биохимийн шинжилгээ, 4) Рентген, 5) Компьютер томограф (СТ), 6) Соронзон резонанст томограф (MRI), 7) Эхо кардиограф, 8) Дуран шинжилгээ. ЭМД-тай иргэд эдгээр шинжилгээнүүдийг 40-90% хөнгөлөлттэй хийлгэх боломжтой бөгөөд өрхийн эмчээс эмнэлгийн магадлагаа авсан байх шаардлагатай."})
+        # If no direct match, use a comprehensive response
         else:
-            return jsonify({'text': "Эрүүл мэндийн даатгал нь даатгуулагчийн эрүүл мэндийн улмаас учирч болзошгүй санхүүгийн эрсдэлийг хуваалцах зорилготой. emd.gov.mn сайтаас дэлгэрэнгүй мэдээлэл авах боломжтой. Тодорхой асуулт байвал надаас асууна уу."})
+            return jsonify({'text': "Эрүүл мэндийн даатгал нь доорх тохиолдлуудад хамаардаг: 1) Эмнэлгийн тусламж, 2) Оношилгоо, шинжилгээ, 3) Эмчилгээний зардал, 4) Эмийн хөнгөлөлт. Иргэн та эмнэлгийн магадлагаатай бол ЭМД-тай гэрээт эмнэлгээр үйлчлүүлж, хөнгөлөлт эдлэх боломжтой. Тусламж шаардлагатай бол надаас тодорхой асуулт асууна уу."})
         
     except requests.exceptions.ConnectionError:
         logger.error("Could not connect to Rasa server")
@@ -180,9 +191,23 @@ def save_unanswered():
         return jsonify({'success': False, 'error': 'Асуулт хоосон байна.'}), 400
     
     try:
+        # Analyze the question for learning purposes
+        # Check if we've seen similar questions
+        similar_questions = UnansweredQuestion.query.filter(
+            UnansweredQuestion.question.ilike(f'%{question[:10]}%')
+        ).limit(3).all()
+        
+        # Save the new question
         unanswered = UnansweredQuestion(question=question)
         db.session.add(unanswered)
         db.session.commit()
+        
+        # Log for machine learning training purposes
+        logger.info(f"Learning from question: {question}")
+        logger.info(f"Found {len(similar_questions)} similar questions in database")
+        
+        # This data can be used later to train the model
+        # Each time a user asks a similar question, we're collecting data patterns
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error saving unanswered question: {e}")

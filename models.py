@@ -43,6 +43,11 @@ class UnansweredQuestion(db.Model):
     question = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_processed = Column(Boolean, default=False)
+    # Add fields for machine learning
+    keywords = Column(Text, nullable=True)
+    frequency = Column(Integer, default=1)
+    topic_classification = Column(String(100), nullable=True)
+    response_effectiveness = Column(Integer, nullable=True)  # User feedback on how good the answer was
     
     def __repr__(self):
         return f"<UnansweredQuestion {self.question[:30]}...>"
