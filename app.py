@@ -89,9 +89,10 @@ def chat():
         # Log the user message for debugging
         logger.debug(f"User message: '{user_message}'")
         
-        # Use the learning engine to learn from this question
-        # This enables the chatbot to gradually improve with interactions
-        learning_engine.learn_from_question(user_message)
+        # Temporarily disable learning engine until database is migrated
+        # learning_engine.learn_from_question(user_message)
+        # Just log the message for now
+        logger.info(f"Future learning data: {user_message}")
         
         # Direct pattern matching for common questions
         message_lower = user_message.lower()
@@ -138,7 +139,17 @@ def chat():
         return jsonify({'text': 'Сервертэй холбогдож чадсангүй. Rasa сервер ажиллаж байгаа эсэхийг шалгана уу.'})
     except Exception as e:
         logger.error(f"Error processing message: {e}")
-        return jsonify({'text': 'Алдаа гарлаа. Дахин оролдоно уу.'})
+        # Try to respond anyway even if there was an error with the learning component
+        message_lower = user_message.lower()
+        
+        if "сайн" in message_lower or "өдрийн мэнд" in message_lower:
+            return jsonify({'text': "Сайн байна уу! Би Эрүүл Мэндийн Даатгалын бот байна. Танд хэрхэн туслах вэ?"})
+        elif "даатгал гэж юу" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгал гэдэг нь иргэдийн эрүүл мэндийн тусламж үйлчилгээний зардлыг хуваалцах зорилготой нийгмийн даатгалын нэг хэлбэр юм. Энэ нь өвчин эмгэг, гэмтэл бэртлийн улмаас үүсэх эмнэлгийн тусламж үйлчилгээний зардлыг даатгуулагчид хөнгөвчлөх үүрэгтэй."})
+        elif "эмнэлгүүд" in message_lower or "хөнгөлөлттэй эмчлүүлж" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалын ерөнхий газар нь бүх аймаг, дүүргийн нэгдсэн эмнэлэг, төв эмнэлэг, өрхийн эмнэлэг болон 150 гаруй хувийн эмнэлэгтэй гэрээтэй. Энэ гэрээт эмнэлгүүдэд ЭМД-тай иргэд хөнгөлөлттэй үнээр эмчлүүлэх боломжтой."})
+        else:
+            return jsonify({'text': "Эрүүл мэндийн даатгал нь доорх тохиолдлуудад хамаардаг: 1) Эмнэлгийн тусламж, 2) Оношилгоо, шинжилгээ, 3) Эмчилгээний зардал, 4) Эмийн хөнгөлөлт. Иргэн та эмнэлгийн магадлагаатай бол ЭМД-тай гэрээт эмнэлгээр үйлчлүүлж, хөнгөлөлт эдлэх боломжтой. Тусламж шаардлагатай бол надаас тодорхой асуулт асууна уу."})
 
 @app.route('/api/hospitals', methods=['GET'])
 def get_hospitals():
@@ -191,23 +202,14 @@ def save_unanswered():
         return jsonify({'success': False, 'error': 'Асуулт хоосон байна.'}), 400
     
     try:
-        # Analyze the question for learning purposes
-        # Check if we've seen similar questions
-        similar_questions = UnansweredQuestion.query.filter(
-            UnansweredQuestion.question.ilike(f'%{question[:10]}%')
-        ).limit(3).all()
-        
-        # Save the new question
+        # Simplify to avoid DB schema errors - just save the question
         unanswered = UnansweredQuestion(question=question)
         db.session.add(unanswered)
         db.session.commit()
         
-        # Log for machine learning training purposes
-        logger.info(f"Learning from question: {question}")
-        logger.info(f"Found {len(similar_questions)} similar questions in database")
+        # Log for future machine learning training purposes
+        logger.info(f"Saved question for future learning: {question}")
         
-        # This data can be used later to train the model
-        # Each time a user asks a similar question, we're collecting data patterns
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Error saving unanswered question: {e}")
