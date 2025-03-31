@@ -85,7 +85,27 @@ def chat():
         return jsonify({'text': 'Уучлаарай, таны мессежийг хүлээн авах боломжгүй байна.'})
     
     try:
-        # Pass message to Rasa NLU through our API wrapper
+        # Log the user message for debugging
+        logger.debug(f"User message: '{user_message}'")
+        
+        # Direct pattern matching for common questions
+        message_lower = user_message.lower()
+        
+        # Handle specific patterns directly without relying on Rasa
+        if "дэвтэргүй" in message_lower or "дэвтэр" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалын цахим системд шилжсэнээс хойш эрүүл мэндийн даатгалын дэвтэр шаардлагагүй болсон. Регистрийн дугаараар болон хурууны хээгээ уншуулж эрүүл мэндийн тусламж үйлчилгээ авах боломжтой."})
+        elif "гэрээт" in message_lower and "эмнэлг" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалын ерөнхий газартай гэрээт эрүүл мэндийн байгууллагын хаяг байршил, утасны дугаар, үйл ажиллагааны чиглэл www.emd.gov.mn сайтад гэрээт байгууллага цэс рүү нэвтрэн орж харах боломжтой."})
+        elif "жагсаалт" in message_lower and "эмнэлг" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалын ерөнхий газартай гэрээт эрүүл мэндийн байгууллагын хаяг байршил, утасны дугаар, үйл ажиллагааны чиглэл www.emd.gov.mn сайтад гэрээт байгууллага цэс рүү нэвтрэн орж харах боломжтой."})
+        elif "шимтгэл" in message_lower or "төлбөр" in message_lower or "хураамж" in message_lower:
+            return jsonify({'text': "ЭМД-ын шимтгэл 2025 оны 1-3 сар хүртэл сарын 13200 төгрөг, 4-р сараас эхлэн 15840 төгрөг болно."})
+        elif "хөнгөлөлт" in message_lower and "эм" in message_lower:
+            return jsonify({'text': "ЭМД-ын хөнгөлөлттэй эмийн жагсаалтаар 600 нэр төрлийн эмийг 30-100 хувийн хөнгөлөлттэй үнээр авах боломжтой."})
+        elif "үйлчилгээ" in message_lower or "тусламж" in message_lower and "болох" in message_lower:
+            return jsonify({'text': "Эрүүл мэндийн даатгалаар авах боломжтой тусламж үйлчилгээ: Хэвтүүлэн эмчлэх тусламж, амбулаторийн тусламж, өндөр өртөгтэй оношилгоо, яаралтай тусламж, түргэн тусламж, телемедицин, өдрийн эмчилгээ, диализ, хорт хавдрын хими, сэргээн засах тусламж, хөнгөвчлөх тусламж, уламжлалт анагаах ухааны тусламж, эмийн үнийн хөнгөлөлт."})
+        
+        # If no direct match, pass to Rasa API
         response = rasa_api.send_message(user_message)
         logger.debug(f"Rasa response: {response}")
         
