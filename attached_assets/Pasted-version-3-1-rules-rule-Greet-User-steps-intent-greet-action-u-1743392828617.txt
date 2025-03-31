@@ -1,0 +1,88 @@
+version: "3.1"
+
+rules:
+  - rule: Greet User
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - rule: Handle Fallback
+    steps:
+      - intent: nlu_fallback
+      - action: action_save_unanswered_question
+      - action: utter_fallback
+
+  - rule: Provide hospital info
+    steps:
+      - intent: ask_hospital_info
+      - action: action_get_hospital_info
+
+  - rule: Provide insurance info
+    steps:
+      - intent: ask_insurance_info
+      - action: utter_insurance_info
+
+  - rule: Provide payment methods
+    steps:
+      - intent: ask_payment_methods
+      - action: utter_payment_methods
+
+  - rule: Provide insurance premium info
+    steps:
+      - intent: faq_insurance_premium
+      - action: utter_faq_insurance_premium
+
+  - rule: Check premium due
+    steps:
+      - intent: faq_check_premium_due
+      - action: utter_faq_check_premium_due
+
+  - rule: Payment channels
+    steps:
+      - intent: faq_payment_channels
+      - action: utter_faq_payment_channels
+
+  - rule: Discounted medicines
+    steps:
+      - intent: faq_discounted_medicines
+      - action: utter_faq_discounted_medicines
+
+  - rule: Services covered
+    steps:
+      - intent: faq_services_covered
+      - action: utter_faq_services_covered
+
+  - rule: Mandatory contributions
+    steps:
+      - intent: faq_mandatory_contributions
+      - action: utter_faq_mandatory_contributions
+
+  - rule: No health booklet
+    steps:
+      - intent: faq_no_health_booklet
+      - action: utter_faq_no_health_booklet
+
+  - rule: Contract hospitals
+    steps:
+      - intent: faq_contract_hospitals
+      - action: utter_faq_contract_hospitals
+
+  - rule: Waiting time
+    steps:
+      - intent: faq_waiting_time
+      - action: utter_faq_waiting_time
+
+  - rule: Rural medicine
+    steps:
+      - intent: faq_rural_medicine
+      - action: utter_faq_rural_medicine
+
+  - rule: Premium exemption
+    steps:
+      - intent: faq_premium_exemption
+      - action: utter_faq_premium_exemption
+
+  - rule: Sealed records
+    steps:
+      - intent: faq_sealed_records
+      - action: utter_faq_sealed_records
