@@ -18,6 +18,17 @@
         vm.isRecording = false;
         vm.recognition = null;
         vm.isMicAvailable = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+        
+        // Quick questions list
+        vm.quickQuestions = [
+            { id: 1, text: 'ЭМД төлбөр хэмжээ хэд вэ?' },
+            { id: 2, text: 'Эмийн үнийн хөнгөлөлт' },
+            { id: 3, text: 'Хөнгөлөлттэй эмийн жагсаалт' },
+            { id: 4, text: 'ЭМД-ын гэрээт эмнэлгүүд' },
+            { id: 5, text: 'Даатгалын шимтгэлийн дутуу саруудаа хэрхэн шалгах вэ?' },
+            { id: 6, text: 'Эрүүл мэндийн даатгалаа хэрхэн төлөх вэ?' },
+            { id: 7, text: 'Даатгалаараа ямар оношилгоонд хамрагдаж болох вэ?' }
+        ];
 
         // Initialize speech recognition if available
         if (vm.isMicAvailable) {
@@ -66,6 +77,12 @@
         // Apply dark mode on initialization
         document.documentElement.setAttribute('data-bs-theme', vm.darkMode ? 'dark' : 'light');
 
+        // Function to handle quick question selection
+        vm.selectQuickQuestion = function(question) {
+            vm.messageText = question.text;
+            vm.sendMessage();
+        };
+        
         // Function to send message
         vm.sendMessage = function() {
             if (!vm.messageText.trim()) return;
